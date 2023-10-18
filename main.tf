@@ -23,6 +23,27 @@ locals {
   writers_map = { for v in local.topic_writers : "${v.topic}/${v.user}" => v }
 }
 
+# Topic API Key
+resource "confluent_api_key" "topic_api_key" {
+  display_name = "${var.cluster_name}-topic-api-key"
+  description  = "${var.cluster_name}-topic-api-key"
+  owner {
+    id          = data.confluent_service_account.topic_service_account.id
+    api_version = data.confluent_service_account.topic_service_account.api_version
+    kind        = data.confluent_service_account.topic_service_account.kind
+  }
+
+  managed_resource {
+    id          = data.confluent_kafka_cluster.cluster.id
+    api_version = data.confluent_kafka_cluster.cluster.api_version
+    kind        = data.confluent_kafka_cluster.cluster.kind
+
+    environment {
+      id = var.environment_id
+    }
+  }
+}
+
 # Topics
 resource "confluent_kafka_topic" "topics" {
   for_each = var.topics
@@ -34,8 +55,8 @@ resource "confluent_kafka_topic" "topics" {
   rest_endpoint    = data.confluent_kafka_cluster.cluster.rest_endpoint
   config           = try(each.value.config, {})
   credentials {
-    key    = var.admin_api_key.id
-    secret = var.admin_api_key.secret
+    key    = confluent_api_key.topic_api_key.id
+    secret = confluent_api_key.topic_api_key.secret
   }
 }
 
@@ -55,8 +76,8 @@ resource "confluent_kafka_acl" "readers" {
   permission    = "ALLOW"
   rest_endpoint = data.confluent_kafka_cluster.cluster.rest_endpoint
   credentials {
-    key    = var.admin_api_key.id
-    secret = var.admin_api_key.secret
+    key    = confluent_api_key.topic_api_key.id
+    secret = confluent_api_key.topic_api_key.secret
   }
 }
 
@@ -76,8 +97,8 @@ resource "confluent_kafka_acl" "writers" {
   permission    = "ALLOW"
   rest_endpoint = data.confluent_kafka_cluster.cluster.rest_endpoint
   credentials {
-    key    = var.admin_api_key.id
-    secret = var.admin_api_key.secret
+    key    = confluent_api_key.topic_api_key.id
+    secret = confluent_api_key.topic_api_key.secret
   }
 }
 
@@ -97,7 +118,7 @@ resource "confluent_kafka_acl" "group_readers" {
   permission    = "ALLOW"
   rest_endpoint = data.confluent_kafka_cluster.cluster.rest_endpoint
   credentials {
-    key    = var.admin_api_key.id
-    secret = var.admin_api_key.secret
+    key    = confluent_api_key.topic_api_key.id
+    secret = confluent_api_key.topic_api_key.secret
   }
 }

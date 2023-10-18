@@ -1,12 +1,3 @@
-variable "admin_api_key" {
-  description = "ID for the admin api key"
-  type        = object({
-    id     = string
-    secret = string
-  })
-  sensitive   = true
-}
-
 variable "cluster_name" {
   description = "Confluent Cloud cluster name"
   type        = string
@@ -14,6 +5,11 @@ variable "cluster_name" {
 
 variable "environment_id" {
   description = "Confluent Cloud environment id"
+  type        = string
+}
+
+variable "service_account_name" {
+  description = "Service account to generate credentials used to create and manage topics"
   type        = string
 }
 
