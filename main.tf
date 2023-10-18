@@ -39,7 +39,7 @@ resource "confluent_api_key" "topic_api_key" {
     kind        = data.confluent_kafka_cluster.cluster.kind
 
     environment {
-      id = var.environment_id
+      id = data.confluent_environment.environment.id
     }
   }
 }

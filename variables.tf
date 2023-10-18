@@ -3,8 +3,8 @@ variable "cluster_name" {
   type        = string
 }
 
-variable "environment_id" {
-  description = "Confluent Cloud environment id"
+variable "environment_name" {
+  description = "Confluent Cloud environment name"
   type        = string
 }
 
